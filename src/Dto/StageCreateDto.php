@@ -18,15 +18,3 @@ class StageCreateDto
     #[Assert\NotBlank]
     public int $bodegaId;
 }
-
-class StageUpdateDto
-{
-    #[Assert\Optional]
-    public ?string $nombre = null;
-
-    #[Assert\Optional]
-    public ?int $orden = null;
-
-    #[Assert\Optional]
-    public ?string $descripcion = null;
-}

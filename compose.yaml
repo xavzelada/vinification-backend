@@ -12,6 +12,30 @@ services:
       - database_data:/var/lib/postgresql/data:rw
       # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
       # - ./docker/db/data:/var/lib/postgresql/data:rw
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - database
+    environment:
+      DATABASE_URL: postgresql://vinification:vinification@database:5432/vinification?serverVersion=14&charset=utf8
+      JWT_PASSPHRASE: change_me
+      APP_ENV: dev
+    ports:
+      - \"8000:8000\"
+    volumes:
+      - ./:/app
+  test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    profiles: [\"test\"]
+    environment:
+      APP_ENV: test
+    volumes:
+      - ./:/app
+    command: [\"composer\", \"run\", \"test:ci\"]
 ###< doctrine/doctrine-bundle ###
 
 volumes:

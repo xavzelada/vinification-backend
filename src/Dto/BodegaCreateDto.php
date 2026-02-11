@@ -15,12 +15,3 @@ class BodegaCreateDto
     #[Assert\Optional]
     public ?string $pais = null;
 }
-
-class BodegaUpdateDto
-{
-    #[Assert\Optional]
-    public ?string $nombre = null;
-
-    #[Assert\Optional]
-    public ?string $pais = null;
-}

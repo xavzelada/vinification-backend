@@ -46,6 +46,12 @@ composer run dev
 - `composer run migrate`
 - `composer run seed`
 - `composer run test`
+- `composer run test:ci`
 
 ## Nota sobre recomendaciones
 Las recomendaciones son heuristicas y explicables. No sustituyen criterio enologico.
+
+## Tests via Docker
+```
+docker compose --profile test up --abort-on-container-exit test
+```
