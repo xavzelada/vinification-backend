@@ -83,7 +83,7 @@ class MeasurementsController extends ApiController
             $measurement->setComentario($dto->comentario);
         }
         if ($dto->fechaHora !== null) {
-            $measurement->setFechaHora(new \\DateTimeImmutable($dto->fechaHora));
+            $measurement->setFechaHora(new \DateTimeImmutable($dto->fechaHora));
         }
         $this->em->flush();
         return $this->jsonOk($measurement);

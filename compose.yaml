@@ -20,22 +20,24 @@ services:
       - database
     environment:
       DATABASE_URL: postgresql://vinification:vinification@database:5432/vinification?serverVersion=14&charset=utf8
+      JWT_SECRET_KEY: /app/config/jwt/private.pem
+      JWT_PUBLIC_KEY: /app/config/jwt/public.pem
       JWT_PASSPHRASE: change_me
       APP_ENV: dev
     ports:
-      - \"8000:8000\"
+      - "8000:8000"
     volumes:
       - ./:/app
   test:
     build:
       context: .
       dockerfile: Dockerfile
-    profiles: [\"test\"]
+    profiles: ["test"]
     environment:
       APP_ENV: test
     volumes:
       - ./:/app
-    command: [\"composer\", \"run\", \"test:ci\"]
+    command: ["composer", "run", "test:ci"]
 ###< doctrine/doctrine-bundle ###
 
 volumes:

@@ -231,7 +231,7 @@ class BatchesController extends ApiController
             ->setTemperaturaC((string) $dto->temperaturaC)
             ->setBrix($dto->brix !== null ? (string) $dto->brix : null)
             ->setComentario($dto->comentario)
-            ->setFechaHora($dto->fechaHora ? new \\DateTimeImmutable($dto->fechaHora) : new \\DateTimeImmutable());
+            ->setFechaHora($dto->fechaHora ? new \DateTimeImmutable($dto->fechaHora) : new \DateTimeImmutable());
 
         $this->em->persist($measurement);
         $this->em->flush();
