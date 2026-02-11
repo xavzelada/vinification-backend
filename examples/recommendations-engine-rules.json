@@ -1,0 +1,205 @@
+{
+  "rules": [
+    {
+      "id": "r1",
+      "stage": "recepcion",
+      "action_type": "control_temperatura",
+      "conditions": [
+        {"source": "measurements", "field": "temperatura", "operator": ">", "value": 22}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Revisar enfriamiento en recepcion", "Registrar ajuste"],
+      "contraindications": ["Evitar cambios bruscos de temperatura"],
+      "base_score": 0.6
+    },
+    {
+      "id": "r2",
+      "stage": "desfangado",
+      "action_type": "desfangado_suave",
+      "conditions": [
+        {"source": "measurements", "field": "temperatura", "operator": "<", "value": 10}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Extender tiempo de desfangado", "Monitorear turbidez"],
+      "contraindications": ["No aplicar si hay riesgo de oxidacion"],
+      "base_score": 0.5
+    },
+    {
+      "id": "r3",
+      "stage": "fermentacion",
+      "action_type": "nutricion_levaduras",
+      "conditions": [
+        {"source": "analyses", "field": "YAN", "operator": "<", "value": 140}
+      ],
+      "suggested_products": [
+        {"id": "nutriente_levaduras", "name": "Nutriente de levaduras"}
+      ],
+      "dosage_range": {"min": 10, "max": 30, "unit": "g/hL"},
+      "steps": ["Disolver nutriente", "Agregar en 2 dosis", "Registrar"],
+      "contraindications": ["Evitar sobredosificar"],
+      "base_score": 0.7
+    },
+    {
+      "id": "r4",
+      "stage": "fermentacion",
+      "action_type": "control_temperatura",
+      "conditions": [
+        {"source": "measurements", "field": "temperatura", "operator": ">", "value": 28}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Ajustar refrigeracion", "Revisar densidad"],
+      "contraindications": ["No aplicar choques termicos"],
+      "base_score": 0.6
+    },
+    {
+      "id": "r5",
+      "stage": "fermentacion",
+      "action_type": "aireacion_suave",
+      "conditions": [
+        {"source": "measurements", "field": "densidad", "operator": ">", "value": 1.020}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Evaluar actividad fermentativa", "Airear suavemente si procede"],
+      "contraindications": ["Evitar oxidacion en vinos delicados"],
+      "base_score": 0.55
+    },
+    {
+      "id": "r6",
+      "stage": "maceracion",
+      "action_type": "remontado",
+      "conditions": [
+        {"source": "measurements", "field": "temperatura", "operator": "between", "value": 18, "valueMax": 28}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Programar remontados", "Registrar intensidad"],
+      "contraindications": ["No aplicar si hay riesgo de extraccion excesiva"],
+      "base_score": 0.5
+    },
+    {
+      "id": "r7",
+      "stage": "prensado",
+      "action_type": "prensado_suave",
+      "conditions": [
+        {"source": "measurements", "field": "temperatura", "operator": "<", "value": 20}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Aplicar presiones bajas", "Separar fracciones"],
+      "contraindications": ["No mezclar fracciones sin evaluar"],
+      "base_score": 0.5
+    },
+    {
+      "id": "r8",
+      "stage": "malolactica",
+      "action_type": "control_temperatura",
+      "conditions": [
+        {"source": "measurements", "field": "temperatura", "operator": "<", "value": 18}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Elevar temperatura gradualmente", "Monitorear"],
+      "contraindications": ["Evitar calentamientos bruscos"],
+      "base_score": 0.55
+    },
+    {
+      "id": "r9",
+      "stage": "crianza",
+      "action_type": "ajuste_so2",
+      "conditions": [
+        {"source": "analyses", "field": "SO2_libre", "operator": "<", "value": 18}
+      ],
+      "suggested_products": [
+        {"id": "sulfito_potasico", "name": "Sulfito potasico"}
+      ],
+      "dosage_range": {"min": 10, "max": 30, "unit": "mg/L"},
+      "steps": ["Calcular dosis segun volumen", "Aplicar y mezclar"],
+      "contraindications": ["Considerar limites legales"],
+      "base_score": 0.65
+    },
+    {
+      "id": "r10",
+      "stage": "estabilizacion",
+      "action_type": "estabilizacion_tartaro",
+      "conditions": [
+        {"source": "analyses", "field": "acidez_total", "operator": ">", "value": 7.0}
+      ],
+      "suggested_products": [
+        {"id": "bentonita", "name": "Bentonita"}
+      ],
+      "dosage_range": {"min": 20, "max": 60, "unit": "g/hL"},
+      "steps": ["Preparar suspension", "Aplicar segun protocolo"],
+      "contraindications": ["Evitar sobreclarificacion"],
+      "base_score": 0.5
+    },
+    {
+      "id": "r11",
+      "stage": "filtracion",
+      "action_type": "filtrado",
+      "conditions": [
+        {"source": "analyses", "field": "turbidez", "operator": ">", "value": 2.0}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Seleccionar medio filtrante", "Filtrar y controlar"],
+      "contraindications": ["Evitar perdida de aroma"],
+      "base_score": 0.45
+    },
+    {
+      "id": "r12",
+      "stage": "embotellado",
+      "action_type": "control_so2_final",
+      "conditions": [
+        {"source": "analyses", "field": "SO2_total", "operator": ">", "value": 150}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Verificar limites legales", "Ajustar si corresponde"],
+      "contraindications": ["No embotellar fuera de especificacion"],
+      "base_score": 0.6
+    },
+    {
+      "id": "r13",
+      "stage": "fermentacion",
+      "action_type": "control_azucares",
+      "conditions": [
+        {"source": "analyses", "field": "azucares", "operator": ">", "value": 5}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Revisar avance fermentativo", "Monitorear densidad"],
+      "contraindications": ["Evitar intervenciones abruptas"],
+      "base_score": 0.5
+    },
+    {
+      "id": "r14",
+      "stage": "fermentacion",
+      "action_type": "control_va",
+      "conditions": [
+        {"source": "analyses", "field": "VA", "operator": ">", "value": 0.7}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Evaluar higiene y temperatura", "Registrar"],
+      "contraindications": ["No enmascarar defectos"],
+      "base_score": 0.5
+    },
+    {
+      "id": "r15",
+      "stage": "crianza",
+      "action_type": "rellenado_barrica",
+      "conditions": [
+        {"source": "measurements", "field": "nivel", "operator": "<", "value": 90}
+      ],
+      "suggested_products": [],
+      "dosage_range": {"min": 0, "max": 0, "unit": ""},
+      "steps": ["Completar barrica", "Evitar contacto con oxigeno"],
+      "contraindications": ["No mezclar lotes sin autorizacion"],
+      "base_score": 0.45
+    }
+  ]
+}

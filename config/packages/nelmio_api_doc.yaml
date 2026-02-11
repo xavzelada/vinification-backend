@@ -1,0 +1,18 @@
+nelmio_api_doc:
+  documentation:
+    info:
+      title: Gestor de Vinificacion API
+      description: API backend
+      version: 1.0.0
+    components:
+      securitySchemes:
+        Bearer:
+          type: http
+          scheme: bearer
+          bearerFormat: JWT
+    security:
+      - Bearer: []
+  areas:
+    default:
+      path_patterns:
+        - ^/(?!_error)

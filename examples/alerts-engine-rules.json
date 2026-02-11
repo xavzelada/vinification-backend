@@ -1,0 +1,59 @@
+{
+  "bodegaId": "BODEGA-01",
+  "etapas": {
+    "fermentacion": [
+      {
+        "id": "r1",
+        "name": "Densidad alta",
+        "type": "threshold",
+        "field": "densidad",
+        "threshold": 1.020,
+        "thresholdOperator": ">",
+        "severity": "warn",
+        "active": true
+      },
+      {
+        "id": "r2",
+        "name": "Temperatura fuera de rango",
+        "type": "range",
+        "field": "temperatura",
+        "min": 16,
+        "max": 28,
+        "severity": "info",
+        "active": true
+      },
+      {
+        "id": "r3",
+        "name": "Subida rapida de temperatura",
+        "type": "rate_of_change",
+        "field": "temperatura",
+        "windowHours": 6,
+        "threshold": 0.5,
+        "severity": "critical",
+        "active": true
+      },
+      {
+        "id": "r4",
+        "name": "Tendencia densidad",
+        "type": "trend",
+        "field": "densidad",
+        "windowPoints": 10,
+        "slopeThreshold": 0.002,
+        "severity": "warn",
+        "active": true
+      }
+    ],
+    "crianza": [
+      {
+        "id": "r5",
+        "name": "SO2 libre bajo",
+        "type": "threshold",
+        "field": "SO2_libre",
+        "threshold": 18,
+        "thresholdOperator": "<",
+        "severity": "warn",
+        "active": true
+      }
+    ]
+  }
+}
