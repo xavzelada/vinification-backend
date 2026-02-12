@@ -4,41 +4,47 @@ namespace App\EventSubscriber;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-class CorsSubscriber implements EventSubscriberInterface
+final class CorsSubscriber implements EventSubscriberInterface
 {
-    private const ALLOW_ORIGIN = 'http://localhost:5173';
+    public function __construct(
+        private readonly string $corsAllowOriginRegex, // inject from env
+    ) {}
 
     public static function getSubscribedEvents(): array
     {
         return [
-            KernelEvents::REQUEST => ['onKernelRequest', 1000],
-            KernelEvents::RESPONSE => 'onKernelResponse'
+            // Run late so we don't fight Nelmio if you still keep it
+            KernelEvents::RESPONSE => ['onKernelResponse', -1000],
         ];
-    }
-
-    public function onKernelRequest(RequestEvent $event): void
-    {
-        $request = $event->getRequest();
-        if ($request->getMethod() === 'OPTIONS') {
-            $response = new Response('', 204);
-            $this->addCorsHeaders($response);
-            $event->setResponse($response);
-        }
     }
 
     public function onKernelResponse(ResponseEvent $event): void
     {
-        $response = $event->getResponse();
-        $this->addCorsHeaders($response);
-    }
+        $request = $event->getRequest();
+        $origin = $request->headers->get('Origin');
 
-    private function addCorsHeaders(Response $response): void
-    {
-        $response->headers->set('Access-Control-Allow-Origin', self::ALLOW_ORIGIN);
+        if (!$origin) {
+            return;
+        }
+
+        // origin_regex=true style matching
+        if (@preg_match('#' . $this->corsAllowOriginRegex . '#', '') === false) {
+            // If your regex already includes ^...$, don't wrap it; just use it directly:
+            $pattern = $this->corsAllowOriginRegex;
+        } else {
+            $pattern = $this->corsAllowOriginRegex;
+        }
+
+        if (!preg_match('#' . trim($pattern, '#') . '#', $origin)) {
+            return;
+        }
+
+        $response = $event->getResponse();
+        $response->headers->set('Access-Control-Allow-Origin', $origin);
+        $response->headers->set('Vary', 'Origin'); // important for caches/CDNs
         $response->headers->set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
         $response->headers->set('Access-Control-Allow-Headers', 'Authorization, Content-Type, X-Requested-With');
         $response->headers->set('Access-Control-Allow-Credentials', 'true');
