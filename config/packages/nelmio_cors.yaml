@@ -2,7 +2,7 @@ nelmio_cors:
     defaults:
         origin_regex: true
         allow_origin:
-            - '%env(default::CORS_ALLOW_ORIGIN)%'
+            - '%env(string:CORS_ALLOW_ORIGIN)%'
             - 'http://localhost:5173'
             - 'http://127.0.0.1:5173'
             - 'http://localhost:8000'
