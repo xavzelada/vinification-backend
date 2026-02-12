@@ -1,7 +1,14 @@
 nelmio_cors:
     defaults:
         origin_regex: true
-        allow_origin: []
+        allow_origin:
+            - '%env(default::CORS_ALLOW_ORIGIN)%'
+            - 'http://localhost:5173'
+            - 'http://127.0.0.1:5173'
+            - 'http://localhost:8000'
+            - 'http://127.0.0.1:8000'
+            - 'https://vinora.aulex.site'
+            - 'https://vinora-api.aulex.xyz'
         allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
         allow_headers:
             - 'Content-Type'
