@@ -32,22 +32,17 @@ class AlertRuleCreateDto
     ])]
     public string $operador;
 
-    #[Assert\Optional]
     public ?float $valor = null;
 
-    #[Assert\Optional]
     public ?float $valorMax = null;
 
-    #[Assert\Optional]
     public ?int $periodoDias = null;
 
     #[Assert\NotBlank]
     #[Assert\Choice(choices: [AlertSeverity::INFO, AlertSeverity::WARN, AlertSeverity::CRIT])]
     public string $severidad;
 
-    #[Assert\Optional]
     public ?bool $activa = true;
 
-    #[Assert\Optional]
     public ?string $descripcion = null;
 }

@@ -44,7 +44,15 @@ abstract class ApiController extends AbstractController
 
     protected function jsonOk(mixed $data, int $status = 200, array $context = []): JsonResponse
     {
-        return $this->json($data, $status, [], $context);
+        $defaultContext = [
+            'circular_reference_handler' => function ($object) {
+                if (is_object($object) && method_exists($object, 'getId')) {
+                    return $object->getId();
+                }
+                return null;
+            }
+        ];
+        return $this->json($data, $status, [], array_merge($defaultContext, $context));
     }
 
     protected function getActor(): User

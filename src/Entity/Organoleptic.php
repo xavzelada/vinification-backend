@@ -25,8 +25,8 @@ class Organoleptic
     #[ORM\JoinColumn(nullable: false)]
     private User $usuario;
 
-    #[ORM\Column(type: 'date')]
-    private \DateTimeInterface $fecha;
+    #[ORM\Column(name: 'fecha', type: 'datetime')]
+    private \DateTimeInterface $fechaHora;
 
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $nariz = null;
@@ -39,9 +39,6 @@ class Organoleptic
 
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $defectos = null;
-
-    #[ORM\Column(type: 'string', nullable: true)]
-    private ?string $intensidad = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $notasLibres = null;
@@ -73,14 +70,14 @@ class Organoleptic
         return $this;
     }
 
-    public function getFecha(): \DateTimeInterface
+    public function getFechaHora(): \DateTimeInterface
     {
-        return $this->fecha;
+        return $this->fechaHora;
     }
 
-    public function setFecha(\DateTimeInterface $fecha): self
+    public function setFechaHora(\DateTimeInterface $fechaHora): self
     {
-        $this->fecha = $fecha;
+        $this->fechaHora = $fechaHora;
         return $this;
     }
 
@@ -125,17 +122,6 @@ class Organoleptic
     public function setDefectos(?array $defectos): self
     {
         $this->defectos = $defectos;
-        return $this;
-    }
-
-    public function getIntensidad(): ?string
-    {
-        return $this->intensidad;
-    }
-
-    public function setIntensidad(?string $intensidad): self
-    {
-        $this->intensidad = $intensidad;
         return $this;
     }
 

@@ -6,9 +6,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class BodegaUpdateDto
 {
-    #[Assert\Optional]
     public ?string $nombre = null;
 
-    #[Assert\Optional]
     public ?string $pais = null;
 }

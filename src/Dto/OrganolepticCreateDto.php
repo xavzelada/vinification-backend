@@ -10,24 +10,20 @@ class OrganolepticCreateDto
     public int $loteId;
 
     #[Assert\NotBlank]
-    #[Assert\Date]
-    public string $fecha;
+    #[Assert\DateTime]
+    public string $fechaHora;
 
-    #[Assert\Optional]
+    #[Assert\Type('array')]
     public ?array $nariz = null;
 
-    #[Assert\Optional]
+    #[Assert\Type('array')]
     public ?array $boca = null;
 
-    #[Assert\Optional]
+    #[Assert\Type('array')]
     public ?array $color = null;
 
-    #[Assert\Optional]
+    #[Assert\Type('array')]
     public ?array $defectos = null;
 
-    #[Assert\Optional]
-    public ?string $intensidad = null;
-
-    #[Assert\Optional]
-    public ?string $notasLibres = null;
+    public ?string $comentario = null;
 }

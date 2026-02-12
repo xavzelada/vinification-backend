@@ -63,14 +63,14 @@ class OrganolepticsController extends ApiController
         $data = $this->getJson($request);
         $dto = new OrganolepticCreateDto();
         $dto->loteId = (int) ($data['loteId'] ?? 0);
-        $dto->fecha = (string) ($data['fecha'] ?? '');
+        $dto->fechaHora = (string) ($data['fechaHora'] ?? ($data['fecha'] ?? ''));
         $dto->nariz = $data['nariz'] ?? null;
         $dto->boca = $data['boca'] ?? null;
         $dto->color = $data['color'] ?? null;
         $dto->defectos = $data['defectos'] ?? null;
-        $dto->intensidad = $data['intensidad'] ?? null;
-        $dto->notasLibres = $data['notasLibres'] ?? null;
+        $dto->comentario = $data['comentario'] ?? ($data['notasLibres'] ?? null);
         $this->validateDto($dto);
+        $this->validateOrganolepticPayload($dto->color, $dto->nariz, $dto->boca, $dto->defectos);
 
         $lote = $this->em->getRepository(Batch::class)->find($dto->loteId);
         if (!$lote) {
@@ -82,13 +82,12 @@ class OrganolepticsController extends ApiController
         $org = new Organoleptic();
         $org->setLote($lote)
             ->setUsuario($user)
-            ->setFecha(new \DateTimeImmutable($dto->fecha))
+            ->setFechaHora(new \DateTimeImmutable($dto->fechaHora))
             ->setNariz($dto->nariz)
             ->setBoca($dto->boca)
             ->setColor($dto->color)
             ->setDefectos($dto->defectos)
-            ->setIntensidad($dto->intensidad)
-            ->setNotasLibres($dto->notasLibres);
+            ->setNotasLibres($dto->comentario);
 
         $this->em->persist($org);
         $this->em->flush();
@@ -113,9 +112,9 @@ class OrganolepticsController extends ApiController
         $dto->boca = $data['boca'] ?? null;
         $dto->color = $data['color'] ?? null;
         $dto->defectos = $data['defectos'] ?? null;
-        $dto->intensidad = $data['intensidad'] ?? null;
-        $dto->notasLibres = $data['notasLibres'] ?? null;
+        $dto->comentario = $data['comentario'] ?? ($data['notasLibres'] ?? null);
         $this->validateDto($dto);
+        $this->validateOrganolepticPayload($dto->color, $dto->nariz, $dto->boca, $dto->defectos);
 
         if ($dto->nariz !== null) {
             $org->setNariz($dto->nariz);
@@ -129,11 +128,8 @@ class OrganolepticsController extends ApiController
         if ($dto->defectos !== null) {
             $org->setDefectos($dto->defectos);
         }
-        if ($dto->intensidad !== null) {
-            $org->setIntensidad($dto->intensidad);
-        }
-        if ($dto->notasLibres !== null) {
-            $org->setNotasLibres($dto->notasLibres);
+        if ($dto->comentario !== null) {
+            $org->setNotasLibres($dto->comentario);
         }
         $this->em->flush();
         return $this->jsonOk($org);
@@ -151,5 +147,71 @@ class OrganolepticsController extends ApiController
         $this->em->remove($org);
         $this->em->flush();
         return $this->jsonOk(['deleted' => true]);
+    }
+
+    private function validateOrganolepticPayload(?array $color, ?array $nariz, ?array $boca, ?array $defectos): void
+    {
+        if ($color !== null) {
+            $this->validateRangeField($color, 'intensidad', 1, 5, 'color.intensidad');
+        }
+        if ($nariz !== null) {
+            $this->validateRangeField($nariz, 'intensidad', 1, 5, 'nariz.intensidad');
+            if (isset($nariz['notas']) && is_array($nariz['notas'])) {
+                $allowed = ['fruta', 'floral', 'especias', 'madera', 'reduccion', 'oxidacion', 'otros'];
+                foreach ($nariz['notas'] as $nota) {
+                    if (!is_string($nota)) {
+                        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('nariz.notas debe ser lista de textos');
+                    }
+                    if (!in_array($this->normalizeNote($nota), $allowed, true)) {
+                        throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('nariz.notas contiene valor no permitido');
+                    }
+                }
+            }
+        }
+        if ($boca !== null) {
+            $this->validateRangeField($boca, 'acidez', 1, 5, 'boca.acidez');
+            $this->validateRangeField($boca, 'tanino', 1, 5, 'boca.tanino');
+            $this->validateRangeField($boca, 'alcohol', 1, 5, 'boca.alcohol');
+            $this->validateRangeField($boca, 'cuerpo', 1, 5, 'boca.cuerpo');
+            $this->validateRangeField($boca, 'persistencia', 1, 5, 'boca.persistencia');
+        }
+        if ($defectos !== null) {
+            if (!is_array($defectos)) {
+                throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('defectos debe ser lista');
+            }
+            foreach ($defectos as $defecto) {
+                if (!is_string($defecto)) {
+                    throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('defectos debe ser lista de textos');
+                }
+            }
+        }
+    }
+
+    private function validateRangeField(array $data, string $field, int $min, int $max, string $label): void
+    {
+        if (!array_key_exists($field, $data)) {
+            return;
+        }
+        $value = $data[$field];
+        if (!is_numeric($value)) {
+            throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException($label . ' debe ser numerico');
+        }
+        $value = (int) $value;
+        if ($value < $min || $value > $max) {
+            throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException($label . ' fuera de rango');
+        }
+    }
+
+    private function normalizeNote(string $note): string
+    {
+        $note = strtolower($note);
+        return strtr($note, [
+            'á' => 'a',
+            'é' => 'e',
+            'í' => 'i',
+            'ó' => 'o',
+            'ú' => 'u',
+            'ñ' => 'n',
+        ]);
     }
 }

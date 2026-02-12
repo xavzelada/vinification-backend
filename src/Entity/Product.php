@@ -45,6 +45,15 @@ class Product
     #[ORM\Column(type: 'boolean')]
     private bool $activo = true;
 
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $compatibilidades = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $incompatibilidades = null;
+
+    #[ORM\Column(type: 'json', nullable: true)]
+    private ?array $restriccionesEtapas = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -146,6 +155,39 @@ class Product
     public function setActivo(bool $activo): self
     {
         $this->activo = $activo;
+        return $this;
+    }
+
+    public function getCompatibilidades(): ?array
+    {
+        return $this->compatibilidades;
+    }
+
+    public function setCompatibilidades(?array $compatibilidades): self
+    {
+        $this->compatibilidades = $compatibilidades;
+        return $this;
+    }
+
+    public function getIncompatibilidades(): ?array
+    {
+        return $this->incompatibilidades;
+    }
+
+    public function setIncompatibilidades(?array $incompatibilidades): self
+    {
+        $this->incompatibilidades = $incompatibilidades;
+        return $this;
+    }
+
+    public function getRestriccionesEtapas(): ?array
+    {
+        return $this->restriccionesEtapas;
+    }
+
+    public function setRestriccionesEtapas(?array $restriccionesEtapas): self
+    {
+        $this->restriccionesEtapas = $restriccionesEtapas;
         return $this;
     }
 }

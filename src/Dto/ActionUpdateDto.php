@@ -7,20 +7,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ActionUpdateDto
 {
-    #[Assert\Optional]
     #[Assert\Positive]
     public ?float $dosis = null;
 
-    #[Assert\Optional]
+    #[Assert\Choice(choices: ['g/hL', 'mL/hL', 'mg/L', 'g/L'])]
     public ?string $unidad = null;
 
-    #[Assert\Optional]
     public ?string $objetivo = null;
 
-    #[Assert\Optional]
     public ?string $observaciones = null;
 
-    #[Assert\Optional]
     #[Assert\Choice(choices: [ActionStatus::PENDING, ActionStatus::CONFIRMED])]
     public ?string $estado = null;
 }

@@ -12,7 +12,6 @@ class LocationCreateDto
     #[Assert\NotBlank]
     public string $tipo;
 
-    #[Assert\Optional]
     public ?float $capacidadLitros = null;
 
     #[Assert\NotBlank]

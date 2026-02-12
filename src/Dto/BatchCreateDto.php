@@ -24,17 +24,13 @@ class BatchCreateDto
     #[Assert\NotBlank]
     public int $etapaId;
 
-    #[Assert\Optional]
     public ?int $ubicacionId = null;
 
-    #[Assert\Optional]
     #[Assert\Date]
     public ?string $fechaInicio = null;
 
-    #[Assert\Optional]
     #[Assert\Date]
     public ?string $fechaEmbotellado = null;
 
-    #[Assert\Optional]
     public ?array $regulacion = null;
 }

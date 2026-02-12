@@ -12,7 +12,6 @@ class StageCreateDto
     #[Assert\Positive]
     public int $orden;
 
-    #[Assert\Optional]
     public ?string $descripcion = null;
 
     #[Assert\NotBlank]

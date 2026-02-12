@@ -6,6 +6,7 @@ use App\Dto\ProductCreateDto;
 use App\Dto\ProductUpdateDto;
 use App\Entity\Bodega;
 use App\Entity\Product;
+use App\Entity\Stage;
 use App\Service\AuditService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -65,6 +66,9 @@ class ProductsController extends ApiController
         $dto->rangoDosisMin = $data['rangoDosisMin'] ?? null;
         $dto->rangoDosisMax = $data['rangoDosisMax'] ?? null;
         $dto->notas = $data['notas'] ?? null;
+        $dto->compatibilidades = $data['compatibilidades'] ?? null;
+        $dto->incompatibilidades = $data['incompatibilidades'] ?? null;
+        $dto->restriccionesEtapas = $data['restriccionesEtapas'] ?? null;
         $this->validateDto($dto);
 
         $bodega = $this->em->getRepository(Bodega::class)->find($dto->bodegaId);
@@ -82,6 +86,10 @@ class ProductsController extends ApiController
             ->setRangoDosisMin($dto->rangoDosisMin !== null ? (string) $dto->rangoDosisMin : null)
             ->setRangoDosisMax($dto->rangoDosisMax !== null ? (string) $dto->rangoDosisMax : null)
             ->setNotas($dto->notas);
+
+        $product->setCompatibilidades($this->normalizeCompatList($dto->compatibilidades, $bodega->getId()));
+        $product->setIncompatibilidades($this->normalizeCompatList($dto->incompatibilidades, $bodega->getId()));
+        $product->setRestriccionesEtapas($this->normalizeStageRestrictions($dto->restriccionesEtapas, $bodega->getId()));
 
         $this->em->persist($product);
         $this->em->flush();
@@ -112,6 +120,9 @@ class ProductsController extends ApiController
         $dto->rangoDosisMax = $data['rangoDosisMax'] ?? null;
         $dto->notas = $data['notas'] ?? null;
         $dto->activo = $data['activo'] ?? null;
+        $dto->compatibilidades = $data['compatibilidades'] ?? null;
+        $dto->incompatibilidades = $data['incompatibilidades'] ?? null;
+        $dto->restriccionesEtapas = $data['restriccionesEtapas'] ?? null;
         $this->validateDto($dto);
 
         if ($dto->nombre !== null) {
@@ -138,6 +149,15 @@ class ProductsController extends ApiController
         if ($dto->activo !== null) {
             $product->setActivo($dto->activo);
         }
+        if ($dto->compatibilidades !== null) {
+            $product->setCompatibilidades($this->normalizeCompatList($dto->compatibilidades, $product->getBodega()->getId()));
+        }
+        if ($dto->incompatibilidades !== null) {
+            $product->setIncompatibilidades($this->normalizeCompatList($dto->incompatibilidades, $product->getBodega()->getId()));
+        }
+        if ($dto->restriccionesEtapas !== null) {
+            $product->setRestriccionesEtapas($this->normalizeStageRestrictions($dto->restriccionesEtapas, $product->getBodega()->getId()));
+        }
 
         $this->em->flush();
         return $this->jsonOk($product);
@@ -154,5 +174,59 @@ class ProductsController extends ApiController
         $this->em->remove($product);
         $this->em->flush();
         return $this->jsonOk(['deleted' => true]);
+    }
+
+    private function normalizeCompatList(?array $items, int $bodegaId): ?array
+    {
+        if ($items === null) {
+            return null;
+        }
+        $normalized = [];
+        foreach ($items as $item) {
+            $id = (int) $item;
+            if ($id <= 0) {
+                continue;
+            }
+            $producto = $this->em->getRepository(Product::class)->find($id);
+            if (!$producto) {
+                throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Producto relacionado no encontrado');
+            }
+            if ($producto->getBodega()->getId() !== $bodegaId) {
+                throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Producto relacionado fuera de la bodega');
+            }
+            $normalized[] = $id;
+        }
+        return array_values(array_unique($normalized));
+    }
+
+    private function normalizeStageRestrictions(?array $items, int $bodegaId): ?array
+    {
+        if ($items === null) {
+            return null;
+        }
+        $normalized = [];
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $etapaId = (int) ($item['etapaId'] ?? 0);
+            if ($etapaId <= 0) {
+                continue;
+            }
+            $etapa = $this->em->getRepository(Stage::class)->find($etapaId);
+            if (!$etapa) {
+                throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Etapa no encontrada');
+            }
+            if ($etapa->getBodega()->getId() !== $bodegaId) {
+                throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Etapa fuera de la bodega');
+            }
+            $normalized[] = [
+                'etapaId' => $etapaId,
+                'compatibilidad' => $item['compatibilidad'] ?? null,
+                'dosisRecomendada' => $item['dosisRecomendada'] ?? null,
+                'restricciones' => $item['restricciones'] ?? null,
+            ];
+        }
+        return $normalized;
     }
 }

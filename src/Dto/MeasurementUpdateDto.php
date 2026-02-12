@@ -6,21 +6,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class MeasurementUpdateDto
 {
-    #[Assert\Optional]
     #[Assert\Positive]
     public ?float $densidad = null;
 
-    #[Assert\Optional]
     #[Assert\Positive]
     public ?float $temperaturaC = null;
 
-    #[Assert\Optional]
     public ?float $brix = null;
 
-    #[Assert\Optional]
     public ?string $comentario = null;
 
-    #[Assert\Optional]
     #[Assert\DateTime]
     public ?string $fechaHora = null;
 }

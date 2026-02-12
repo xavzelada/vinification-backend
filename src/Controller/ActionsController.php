@@ -10,6 +10,7 @@ use App\Entity\Product;
 use App\Entity\Stage;
 use App\Enum\ActionStatus;
 use App\Service\AuditService;
+use App\Service\DoseCalculator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,7 +26,8 @@ class ActionsController extends ApiController
         SerializerInterface $serializer,
         ValidatorInterface $validator,
         private EntityManagerInterface $em,
-        private AuditService $audit
+        private AuditService $audit,
+        private DoseCalculator $doseCalculator
     ) {
         parent::__construct($serializer, $validator);
     }
@@ -87,13 +89,28 @@ class ActionsController extends ApiController
         $this->assertTenantBodegaId($etapa->getBodega()->getId());
 
         $user = $this->getUser();
+        $normalizedUnit = $this->doseCalculator->normalizeUnit($dto->unidad);
+        $warnings = [];
+        $doseInProductUnit = $this->doseCalculator->convertDose($dto->dosis, $normalizedUnit, $producto->getUnidad());
+        if ($doseInProductUnit === null) {
+            throw new \Symfony\Component\HttpKernel\Exception\BadRequestHttpException('Unidad incompatible con el producto');
+        }
+        $rangeMin = $producto->getRangoDosisMin() !== null ? (float) $producto->getRangoDosisMin() : null;
+        $rangeMax = $producto->getRangoDosisMax() !== null ? (float) $producto->getRangoDosisMax() : null;
+        if ($rangeMin !== null && $doseInProductUnit < $rangeMin) {
+            $warnings[] = 'Dosis por debajo del rango recomendado';
+        }
+        if ($rangeMax !== null && $doseInProductUnit > $rangeMax) {
+            $warnings[] = 'Dosis por encima del rango recomendado';
+        }
+
         $action = new ActionApplied();
         $action->setLote($lote)
             ->setProducto($producto)
             ->setOperador($user)
             ->setFecha(new \DateTimeImmutable($dto->fecha))
             ->setDosis((string) $dto->dosis)
-            ->setUnidad($dto->unidad)
+            ->setUnidad($normalizedUnit)
             ->setEtapa($etapa)
             ->setObjetivo($dto->objetivo)
             ->setObservaciones($dto->observaciones)
@@ -104,7 +121,17 @@ class ActionsController extends ApiController
 
         $this->audit->log('acciones', (string) $action->getId(), 'create', null, ['loteId' => $lote->getId()], $user?->getId());
 
-        return $this->jsonOk($action, 201);
+        $perHl = $this->doseCalculator->perHlEquivalent($dto->dosis, $normalizedUnit);
+        $total = $this->doseCalculator->totalForVolume($dto->dosis, $normalizedUnit, (float) $lote->getVolumenLitros());
+
+        return $this->jsonOk([
+            'action' => $action,
+            'warnings' => $warnings,
+            'dose' => [
+                'perHl' => $perHl,
+                'total' => $total
+            ]
+        ], 201);
     }
 
     #[Route('/{id}', methods: ['PUT'])]

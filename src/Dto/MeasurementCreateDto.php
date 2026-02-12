@@ -14,13 +14,10 @@ class MeasurementCreateDto
     #[Assert\Positive]
     public float $temperaturaC;
 
-    #[Assert\Optional]
     public ?float $brix = null;
 
-    #[Assert\Optional]
     public ?string $comentario = null;
 
-    #[Assert\Optional]
     #[Assert\DateTime]
     public ?string $fechaHora = null;
 }

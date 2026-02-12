@@ -12,6 +12,5 @@ class BodegaCreateDto
     #[Assert\NotBlank]
     public string $nombre;
 
-    #[Assert\Optional]
     public ?string $pais = null;
 }

@@ -19,17 +19,14 @@ class AnalysisCreateDto
     #[Assert\GreaterThanOrEqual(0)]
     public float $valor;
 
-    #[Assert\Optional]
     public ?string $metodo = null;
 
-    #[Assert\Optional]
     public ?string $laboratorio = null;
 
     #[Assert\NotBlank]
     #[Assert\Date]
     public string $fechaMuestra;
 
-    #[Assert\Optional]
     #[Assert\Date]
     public ?string $fechaResultado = null;
 }

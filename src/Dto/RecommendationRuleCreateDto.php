@@ -22,18 +22,13 @@ class RecommendationRuleCreateDto
     #[Assert\NotBlank]
     public string $accionSugerida;
 
-    #[Assert\Optional]
     public ?int $productoId = null;
 
-    #[Assert\Optional]
     public ?float $dosisSugerida = null;
 
-    #[Assert\Optional]
     public ?string $unidad = null;
 
-    #[Assert\Optional]
     public ?string $explicacion = null;
 
-    #[Assert\Optional]
     public ?bool $activa = true;
 }

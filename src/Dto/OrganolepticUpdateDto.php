@@ -6,21 +6,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class OrganolepticUpdateDto
 {
-    #[Assert\Optional]
+    #[Assert\Type('array')]
     public ?array $nariz = null;
 
-    #[Assert\Optional]
+    #[Assert\Type('array')]
     public ?array $boca = null;
 
-    #[Assert\Optional]
+    #[Assert\Type('array')]
     public ?array $color = null;
 
-    #[Assert\Optional]
+    #[Assert\Type('array')]
     public ?array $defectos = null;
 
-    #[Assert\Optional]
-    public ?string $intensidad = null;
-
-    #[Assert\Optional]
-    public ?string $notasLibres = null;
+    public ?string $comentario = null;
 }

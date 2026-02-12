@@ -41,6 +41,22 @@ composer run dev
 - `POST /batches/{id}/measurements` (guarda medicion, evalua alertas, recalcula recomendaciones)
 - `GET /docs` (Swagger UI)
 
+## Conversion de dosis (utilidad)
+Unidades soportadas:
+- `g/hL`
+- `mL/hL`
+- `mg/L`
+- `g/L`
+
+Reglas usadas:
+- `g/hL` y `mg/L` son equivalentes (1 g/hL = 10 mg/L).
+- `mL/hL` es volumen por volumen y no se convierte a masa.
+- `g/L` es masa por volumen y se convierte a `g/hL` o `mg/L` cuando corresponde.
+- Total para lote (volumen en litros):
+  - `g/hL` -> total en `g` = dosis * (L / 100)
+  - `mL/hL` -> total en `mL` = dosis * (L / 100)
+  - `mg/L` -> total en `mg` = dosis * L
+
 ## Scripts
 - `composer run dev`
 - `composer run migrate`
